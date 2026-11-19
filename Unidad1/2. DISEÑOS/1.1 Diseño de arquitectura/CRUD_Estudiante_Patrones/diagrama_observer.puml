@@ -1,0 +1,58 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+package "2.4.2 Patrón Observer - CRUD Estudiante" {
+  interface "SujetoEventosEstudiante" <<Subject>> {
+    + agregarObservador(obs: ObservadorEstudiante): void
+    + quitarObservador(obs: ObservadorEstudiante): void
+    + notificarObservadores(evento: EventoEstudiante): void
+  }
+
+  class "ControlEstudiante" <<ConcreteSubject>> {
+    - observadores: List<ObservadorEstudiante>
+    + agregarEstudiante(id: int, nombre: String, edad: int): String
+    + actualizarEstudiante(id: int, nombre: String, edad: int): String
+    + eliminarEstudiante(id: int): String
+    + agregarObservador(obs: ObservadorEstudiante): void
+    + quitarObservador(obs: ObservadorEstudiante): void
+    + notificarObservadores(evento: EventoEstudiante): void
+  }
+
+  interface "ObservadorEstudiante" <<Observer>> {
+    + actualizar(evento: EventoEstudiante): void
+  }
+
+  class "ObservadorAuditoriaEstudiante" <<ConcreteObserver>> {
+    - bitacora: List<String>
+    + actualizar(evento: EventoEstudiante): void
+    + getBitacora(): List<String>
+  }
+
+  class "ObservadorNotificacionEstudiante" <<ConcreteObserver>> {
+    - ultimaNotificacion: String
+    + actualizar(evento: EventoEstudiante): void
+    + getUltimaNotificacion(): String
+  }
+
+  class "EventoEstudiante" {
+    - tipo: TipoEventoEstudiante
+    - estudiante: Estudiante
+    - mensaje: String
+  }
+
+  enum "TipoEventoEstudiante" {
+    REGISTRADO
+    ACTUALIZADO
+    ELIMINADO
+  }
+}
+
+ControlEstudiante ..|> SujetoEventosEstudiante
+ControlEstudiante o--> ObservadorEstudiante : notifica a
+ObservadorAuditoriaEstudiante ..|> ObservadorEstudiante
+ObservadorNotificacionEstudiante ..|> ObservadorEstudiante
+ControlEstudiante ..> EventoEstudiante : crea
+EventoEstudiante --> TipoEventoEstudiante
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+package "2.4.4 Patrón Command - CRUD Estudiante" {
+  class "ControlEstudiante" <<Client>> {
+    - invocador: InvocadorComandosEstudiante
+    + agregarEstudiante(id: int, nombre: String, edad: int): String
+    + actualizarEstudiante(id: int, nombre: String, edad: int): String
+    + eliminarEstudiante(id: int): String
+    + deshacerUltimaAccion(): String
+  }
+
+  class "InvocadorComandosEstudiante" <<Invoker>> {
+    - historial: Deque<ComandoCrudEstudiante>
+    - registroComandos: List<String>
+    + ejecutarComando(cmd: ComandoCrudEstudiante): String
+    + deshacerUltimo(): String
+    + getRegistroComandos(): List<String>
+  }
+
+  interface "ComandoCrudEstudiante" <<Command>> {
+    + ejecutar(): String
+    + deshacer(): String
+    + getDescripcion(): String
+  }
+
+  class "ComandoRegistrarEstudiante" <<ConcreteCommand>> {
+    - repositorio: RepositorioEstudiante
+    - estudiante: Estudiante
+    + ejecutar(): String
+    + deshacer(): String
+  }
+
+  class "ComandoActualizarEstudiante" <<ConcreteCommand>> {
+    - repositorio: RepositorioEstudiante
+    - nuevoEstado: Estudiante
+    - estadoAnterior: Estudiante
+    + ejecutar(): String
+    + deshacer(): String
+  }
+
+  class "ComandoEliminarEstudiante" <<ConcreteCommand>> {
+    - repositorio: RepositorioEstudiante
+    - id: int
+    - respaldo: Estudiante
+    + ejecutar(): String
+    + deshacer(): String
+  }
+
+  class "RepositorioEstudiante" <<Receiver>> {
+    + guardar(e: Estudiante): void
+    + actualizar(e: Estudiante): void
+    + eliminar(id: int): void
+    + buscarPorId(id: int): Estudiante
+  }
+}
+
+ControlEstudiante --> InvocadorComandosEstudiante : envía comandos
+InvocadorComandosEstudiante o--> ComandoCrudEstudiante : ejecuta y apila
+ComandoRegistrarEstudiante ..|> ComandoCrudEstudiante
+ComandoActualizarEstudiante ..|> ComandoCrudEstudiante
+ComandoEliminarEstudiante ..|> ComandoCrudEstudiante
+ComandoRegistrarEstudiante --> RepositorioEstudiante : opera
+ComandoActualizarEstudiante --> RepositorioEstudiante : opera
+ComandoEliminarEstudiante --> RepositorioEstudiante : opera
+@enduml

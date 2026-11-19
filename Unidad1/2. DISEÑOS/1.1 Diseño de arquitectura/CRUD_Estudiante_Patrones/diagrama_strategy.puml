@@ -1,0 +1,40 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+package "2.4.3 Patrón Strategy - CRUD Estudiante" {
+  class "ControlEstudiante" <<Context>> {
+    - estrategiaBusqueda: EstrategiaBusquedaEstudiante
+    + cambiarEstrategiaBusqueda(e: EstrategiaBusquedaEstudiante): void
+    + getNombreEstrategiaBusqueda(): String
+    + buscarEstudiantes(criterio: String): List<Estudiante>
+  }
+
+  interface "EstrategiaBusquedaEstudiante" <<Strategy>> {
+    + buscar(estudiantes: List<Estudiante>, criterio: String): List<Estudiante>
+    + getNombre(): String
+  }
+
+  class "BusquedaPorIdStrategy" <<ConcreteStrategy>> {
+    + buscar(estudiantes: List<Estudiante>, criterio: String): List<Estudiante>
+    + getNombre(): String
+  }
+
+  class "BusquedaPorNombreStrategy" <<ConcreteStrategy>> {
+    + buscar(estudiantes: List<Estudiante>, criterio: String): List<Estudiante>
+    + getNombre(): String
+  }
+
+  class "Estudiante" <<Model>> {
+    - id: int
+    - nombre: String
+    - edad: int
+  }
+}
+
+ControlEstudiante o--> EstrategiaBusquedaEstudiante : delega búsqueda
+BusquedaPorIdStrategy ..|> EstrategiaBusquedaEstudiante
+BusquedaPorNombreStrategy ..|> EstrategiaBusquedaEstudiante
+EstrategiaBusquedaEstudiante ..> Estudiante : filtra
+@enduml
